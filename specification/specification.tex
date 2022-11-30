@@ -1,0 +1,94 @@
+\documentclass[12pt,english]{article}
+
+\makeatother
+
+\begin{document}
+
+\title{Specification of a subset of the C programming language.}
+
+\author{}
+
+
+\maketitle
+\begin{abstract}
+  \singlespacing {}
+\end{abstract}
+\vfill
+\pagebreak{}
+
+\section{Introduction}
+
+This is document will become reference document to whatever the language will become.
+
+\section{Semantics draft}
+
+\begin{itemize}
+\item
+  The result of an assignment is not an lvalue.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{    (i=}\DecValTok{12}\NormalTok{) = }\DecValTok{11}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+  The above instance is illegal.
+\item
+  The result of an increment or decrement is not an lvalue.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \DataTypeTok{int}\NormalTok{ i = }\DecValTok{0}\NormalTok{;}
+\NormalTok{    ++i = }\DecValTok{12}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+  The above example is illegal.
+\item
+  The result of a tenary operation is not an lvalue.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \DataTypeTok{int}\NormalTok{ i = }\DecValTok{0}\NormalTok{;}
+    \DecValTok{0}\NormalTok{ ? }\DecValTok{1}\NormalTok{ : i = }\DecValTok{12}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+  The above example is illegal.
+\item
+  The language does not support bit-fields. In C, bit-fields can be used
+  to specify the width that exceeds the width of the underlying type of
+  the declaration.
+\item
+  The language will not allow type definitions to appear anywhere that a
+  type should be specified. For example, the below statement is valid C
+  but should be illegal in this language.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \DataTypeTok{void}\NormalTok{ func(}\KeywordTok{struct}\NormalTok{ S\{}\DataTypeTok{int}\NormalTok{ x;\} s);}
+\end{Highlighting}
+\end{Shaded}
+\item
+  Like C, the language allows pointers to void to implicitly cast to any
+  other pointer types.
+\item
+  \texttt{char} literals will be of type \texttt{char}.
+\item
+  The grammar for initialization should not allow for an empty
+  initializer list. For instance, \texttt{int\ i\ =\ \{\};} is illegal.
+
+\item
+  The scope of the variable declared in the init-statement of the for loop is same as any used within the loop.
+  Thus this block will be illegal, it is very much legal in C.
+
+  %% \begin{Shaded}
+  %%   \begin{Highlighting}[]
+  %%     \NormalTok{ for(}\DataTypeTok{int}\NormalTok{ i = \DecValTok{0}\{}\DataTypeTok{int}\NormalTok{ x;\} s);}
+  %%   \end{Highlighting}
+  %% \end{Shaded}
+
+\end{itemize}
+
+
+\end{document}
