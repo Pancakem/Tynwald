@@ -1,36 +1,37 @@
-ident     : /[a-zA-Z_][a-zA-Z0-9_]*/ ;                           
-number    : /[0-9]+/ ;                                           
-character : /'.'/ ;                                              
-string    : /"(\\\\.|[^\"])*"/ ;                               
+ident     : /[a-zA-Z_][a-zA-Z0-9_]*/ ;                          
+number    : /[0-9]+/ ;                                          
+character : /'.'/ ;                                             
+string    : /"(\\\\.|[^\"])*"/ ;                              
                                                                  
-factor    : '(' <lexp> ')'                                       
-          | <number>                                             
-          | <character>                                          
-          | <string>                                             
-          | <ident> '(' <lexp>? (',' <lexp>)* ')'                
-          | <ident> ;                                            
+factor    : '(' <lexp> ')'                                      
+           | <number>                                            
+           | <character>                                         
+           | <string>                                            
+           | <ident> '(' <lexp>? (',' <lexp>)* ')'               
+           | <ident> ;                                           
+                                                                
+term      : <factor> (('*' | '/' | '%') <factor>)* ;            
+lexp      : <term> (('+' | '-') <term>)* ;                      
+                                                                
+stmt      : '{' <stmt>* '}'                                     
+           | "while" '(' <exp> ')' <stmt>                      
+           | "if"    '(' <exp> ')' <stmt>                      
+           | <ident> '=' <lexp> ';'                              
+           | "puts" '(' <lexp>? ')' ';'                       
+           | "return" <lexp>? ';'                              
+           | <ident> '(' <ident>? (',' <ident>)* ')' ';' ;       
                                                                  
-term      : <factor> (('*' | '/' | '%') <factor>)* ;             
-lexp      : <term> (('+' | '-') <term>)* ;                       
+exp       : <lexp> '>' <lexp>                                   
+           | <lexp> '<' <lexp>                                   
+           | <lexp> ">=" <lexp>                                
+           | <lexp> "<=" <lexp>                                
+           | <lexp> "!=" <lexp>                                
+           | <lexp> "==" <lexp> ;                              
                                                                  
-stmt      : '{' <stmt>* '}'                                      
-            | "while" '(' <exp> ')' <stmt>                       
-            | "if"    '(' <exp> ')' <stmt>                       
-            | <ident> '=' <lexp> ';'                      
-            | "return" <lexp>? ';'                               
-            | <ident> '(' <ident>? (',' <ident>)* ')' ';' ;        
-                                                                        
-exp       : <lexp> '>' <lexp>                                    
-            | <lexp> '<' <lexp>                                    
-            | <lexp> ">=" <lexp>                                 
-            | <lexp> "<=" <lexp>                                 
-            | <lexp> "!=" <lexp>                                 
-            | <lexp> "==" <lexp> ;                               
-                                                                        
-typeident : ("int" | "char" | "float") <ident> ;          
-decls     : (<typeident> ';')* ;                                 
-args      : <typeident>? (',' <typeident>)* ;                    
-body      : '{' <decls> <stmt>* '}' ;                            
-procedure : ("int" | "char" | "float" | "void") <ident> '(' <args>* ')' <body> ; 
-main      : ("int" | "char" | "float" | "void") "main" '('<args>* ')' <body> ; 
-program    : /^/ <decls> <procedure>* <main> /$/ ;
+typeident : ("int" | "char") <ident> ;                      
+decls     : (<typeident> ';')* ;                                
+args      : <typeident>? (',' <typeident>)* ;                   
+body      : '{' <decls> <stmt>* '}' ;                           
+procedure : ("int" | "char") <ident> '(' <args> ')' <body> ;
+main      : "main" '(' ')' <body> ;                           
+program    : /^/ <decls> <procedure>* <main> /$/ ;    

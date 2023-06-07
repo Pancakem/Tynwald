@@ -25,7 +25,7 @@ struct parser {
 } parser_t;
 
 void init_parser(struct parser*);
-
+void delete_parser(struct parser*psr);
 mpc_result_t *parse_grammar(struct parser *psr, const char *);
 
 #endif

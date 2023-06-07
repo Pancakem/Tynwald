@@ -10,6 +10,7 @@ int main(int argc, char **argv)
   struct parser psr;
   init_parser(&psr);
   mpc_result_t *res = parse_grammar(&psr, argv[1]);
-
+  delete_parser(&psr);
+  free(res);
   return 0;
 }

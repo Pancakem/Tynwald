@@ -3,7 +3,13 @@
 #include <assert.h>
 #include <stdlib.h>
 
-void init_parser(struct parser *psr) {
+/**
+ * @brief Initialize each parser according to the grammar
+ *
+ * @param psr
+ */
+void init_parser(struct parser *psr)
+{
     psr->Ident = mpc_new("ident");
     psr->Number = mpc_new("number");
     psr->Character = mpc_new("character");
@@ -25,19 +31,56 @@ void init_parser(struct parser *psr) {
 /**
  * @brief Parses the grammar
  * @note The parser must be initialized before it is parsed in to this function
- * @param psr 
- * @param input 
- * @return mpc_result_t* 
+ * @param psr
+ * @param input
+ * @return mpc_result_t*
  */
-mpc_result_t *parse_grammar(struct parser *psr,  const char *input)
+mpc_result_t *parse_grammar(struct parser *psr, const char *input)
 {
     char *grammar = read_file(GRAMMAR_FILE);
     assert(grammar != NULL);
 
     mpc_err_t *err = mpca_lang(
         MPCA_LANG_DEFAULT,
-        grammar, psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt, psr->Exp,
-        psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Main, psr->Program);
+        " ident     : /[a-zA-Z_][a-zA-Z0-9_]*/ ;                           \n"
+        " number    : /[0-9]+/ ;                                           \n"
+        " character : /'.'/ ;                                              \n"
+        " string    : /\"(\\\\.|[^\"])*\"/ ;                               \n"
+        "                                                                  \n"
+        " factor    : '(' <lexp> ')'                                       \n"
+        "           | <number>                                             \n"
+        "           | <character>                                          \n"
+        "           | <string>                                             \n"
+        "           | <ident> '(' <lexp>? (',' <lexp>)* ')'                \n"
+        "           | <ident> ;                                            \n"
+        "                                                                  \n"
+        " term      : <factor> (('*' | '/' | '%') <factor>)* ;             \n"
+        " lexp      : <term> (('+' | '-') <term>)* ;                       \n"
+        "                                                                  \n"
+        " stmt      : '{' <stmt>* '}'                                      \n"
+        "           | \"while\" '(' <exp> ')' <stmt>                       \n"
+        "           | \"if\"    '(' <exp> ')' <stmt>                       \n"
+        "           | <ident> '=' <lexp> ';'                               \n"
+        "           | \"puts\" '(' <lexp>? ')' ';'                        \n"
+        "           | \"return\" <lexp>? ';'                               \n"
+        "           | <ident> '(' <ident>? (',' <ident>)* ')' ';' ;        \n"
+        "                                                                  \n"
+        " exp       : <lexp> '>' <lexp>                                    \n"
+        "           | <lexp> '<' <lexp>                                    \n"
+        "           | <lexp> \">=\" <lexp>                                 \n"
+        "           | <lexp> \"<=\" <lexp>                                 \n"
+        "           | <lexp> \"!=\" <lexp>                                 \n"
+        "           | <lexp> \"==\" <lexp> ;                               \n"
+        "                                                                  \n"
+        " typeident : (\"int\" | \"char\") <ident> ;                       \n"
+        " decls     : (<typeident> ';')* ;                                 \n"
+        " args      : <typeident>? (',' <typeident>)* ;                    \n"
+        " body      : '{' <decls> <stmt>* '}' ;                            \n"
+        " procedure : (\"int\" | \"char\") <ident> '(' <args> ')' <body> ; \n"
+        " main      : \"main\" '(' ')' <body> ;                            \n"
+        " program    : /^/ <decls> <procedure>* <main> /$/ ;     \n",
+        psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt, psr->Exp,
+        psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Main, psr->Program, NULL);
 
     if (err != NULL)
     {
@@ -61,7 +104,13 @@ mpc_result_t *parse_grammar(struct parser *psr,  const char *input)
     return res;
 }
 
-void delete_parser(struct parser*psr) {
+/**
+ * @brief Clean up parsers
+ *
+ * @param psr
+ */
+void delete_parser(struct parser *psr)
+{
     mpc_cleanup(16, psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt,
                 psr->Exp, psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Main, psr->Program);
 }
