@@ -37,8 +37,9 @@ void init_parser(struct parser *psr)
  */
 mpc_result_t *parse_grammar(struct parser *psr, const char *input)
 {
-    char *grammar = read_file(GRAMMAR_FILE);
-    assert(grammar != NULL);
+    // we are not reading the grammar from file; till we bug out this issue
+    // char *grammar = read_file(GRAMMAR_FILE);
+    // assert(grammar != NULL);
 
     mpc_err_t *err = mpca_lang(
         MPCA_LANG_DEFAULT,
@@ -72,13 +73,12 @@ mpc_result_t *parse_grammar(struct parser *psr, const char *input)
         "           | <lexp> \"!=\" <lexp>                                 \n"
         "           | <lexp> \"==\" <lexp> ;                               \n"
         "                                                                  \n"
-        " typeident : (\"int\" | \"char\") <ident> ;                       \n"
+        " typeident : (\"int\" | \"char\" | \"float\") <ident> ;                       \n"
         " decls     : (<typeident> ';')* ;                                 \n"
         " args      : <typeident>? (',' <typeident>)* ;                    \n"
         " body      : '{' <decls> <stmt>* '}' ;                            \n"
-        " procedure : (\"int\" | \"char\") <ident> '(' <args> ')' <body> ; \n"
-        " main      : \"main\" '(' ')' <body> ;                            \n"
-        " program    : /^/ <decls> <procedure>* <main> /$/ ;     \n",
+        " procedure : (\"int\" | \"char\" | \"float\") <ident> '(' <args> ')' <body> ; \n"
+        " program    : /^/ <decls> <procedure>+ /$/ ;     \n",
         psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt, psr->Exp,
         psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Main, psr->Program, NULL);
 
