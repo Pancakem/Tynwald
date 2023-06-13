@@ -33,5 +33,4 @@ decls     : (<typeident> ';')* ;
 args      : <typeident>? (',' <typeident>)* ;                   
 body      : '{' <decls> <stmt>* '}' ;                           
 procedure : ("int" | "char") <ident> '(' <args> ')' <body> ;
-main      : "main" '(' ')' <body> ;                           
-program    : /^/ <decls> <procedure>* <main> /$/ ;    
+program    : /^/ <decls> <procedure>* /$/ ;    

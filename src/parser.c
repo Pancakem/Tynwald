@@ -24,7 +24,6 @@ void init_parser(struct parser *psr)
     psr->Args = mpc_new("args");
     psr->Body = mpc_new("body");
     psr->Procedure = mpc_new("procedure");
-    psr->Main = mpc_new("main");
     psr->Program = mpc_new("program");
 }
 
@@ -80,7 +79,7 @@ mpc_result_t *parse_grammar(struct parser *psr, const char *input)
         " procedure : (\"int\" | \"char\" | \"float\") <ident> '(' <args> ')' <body> ; \n"
         " program    : /^/ <decls> <procedure>+ /$/ ;     \n",
         psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt, psr->Exp,
-        psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Main, psr->Program, NULL);
+        psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Program, NULL);
 
     if (err != NULL)
     {
@@ -92,8 +91,7 @@ mpc_result_t *parse_grammar(struct parser *psr, const char *input)
     mpc_result_t *res = malloc(sizeof(mpc_result_t));
     if (mpc_parse_contents(input, psr->Program, res))
     {
-        mpc_ast_print(res->output);
-        mpc_ast_delete(res->output);
+        /*mpc_ast_print(res->output);*/
     }
     else
     {
@@ -111,6 +109,6 @@ mpc_result_t *parse_grammar(struct parser *psr, const char *input)
  */
 void delete_parser(struct parser *psr)
 {
-    mpc_cleanup(16, psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt,
-                psr->Exp, psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Main, psr->Program);
+    mpc_cleanup(15, psr->Ident, psr->Number, psr->Character, psr->String, psr->Factor, psr->Term, psr->Lexp, psr->Stmt,
+                psr->Exp, psr->Typeident, psr->Decls, psr->Args, psr->Body, psr->Procedure, psr->Program);
 }

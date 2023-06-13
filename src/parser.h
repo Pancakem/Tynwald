@@ -20,7 +20,6 @@ struct parser {
     mpc_parser_t *Args;
     mpc_parser_t *Body;
     mpc_parser_t *Procedure;
-    mpc_parser_t *Main;
     mpc_parser_t *Program;
 } parser_t;
 
