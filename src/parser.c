@@ -62,6 +62,7 @@ mpc_result_t *parse_grammar(struct parser *psr, const char *input)
         "           | \"while\" '(' <exp> ')' <stmt>                       \n"
         "           | \"if\"    '(' <exp> ')' <stmt>                       \n"
         "           | <ident> '=' <lexp> ';'                               \n"
+        "           | <typeident> '=' <lexp> ';'                           \n"
         "           | \"puts\" '(' <lexp>? ')' ';'                        \n"
         "           | \"return\" <lexp>? ';'                               \n"
         "           | <ident> '(' <ident>? (',' <ident>)* ')' ';' ;        \n"
