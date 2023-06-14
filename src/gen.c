@@ -1,9 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include "gen.h"
 #include "mpc.h"
+
+static char *new_str(char *input)
+{
+	int len = strlen(input) + 1;
+	char *s = malloc(sizeof(char) * len);
+	snprintf(s, len, "%s", input);
+	return s;
+}
+
+static mpc_ast_t *firstchild(mpc_ast_t *ast)
+{
+	char *barloc = strchr(ast->tag, '|'),
+	     *gtloc = strchr(ast->tag, '>');
+	if (barloc && (!gtloc || barloc + 1 < gtloc)) {
+		mpc_ast_t *new = mpc_ast_new(barloc+1, ast->contents);
+		new->children_num = ast->children_num;
+		new->children = ast->children;
+		return new;
+	}
+	return (ast->children_num > 0) ? ast->children[0] : NULL;
+}
 
 static char *proc_getident(mpc_ast_t *ast)
 {
@@ -51,46 +73,106 @@ ndigits(int n)
 	return i;
 }
 
-char *getvar(int count)
+char *getvar(int *counter)
 {
-	int len = ndigits(count) + 2;
+	int len = ndigits(*counter) + 2;
 	char *val = malloc(sizeof(char) * len);
-	snprintf(val, len, "t%d", count);
+	snprintf(val, len, "t%d", (*counter)++);
 	return val;
 }
 
-char *term_rval(mpc_ast_t *exp, int *counter)
+char *lexp_getrval(mpc_ast_t *, int *counter);
+
+char *factor_getrval(mpc_ast_t *factor, int *counter)
 {
-	return "term";
+	/* 
+	 * XXX: only catering for first two productions here
+	 *
+	 * factor	: '(' <lexp> ')'
+	 * 		| <number> ;
+	 */
+
+	mpc_ast_t *first = firstchild(factor);
+	if (factor->children_num == 0) {
+		/* XXX: check more rigorously that first is a number */
+		return new_str(factor->contents);
+	}
+
+	/* assure bracketed expressions */
+	assert(factor->children_num == 3);
+	mpc_ast_t *lbrac = factor->children[0],
+		*lexp = factor->children[1],
+		*rbrac = factor->children[2];
+	assert(strcmp(lbrac->tag, "char") == 0
+		&& strcmp(rbrac->tag, "char") == 0);
+
+	return lexp_getrval(lexp, counter);
 }
 
-char *lexp_rval(mpc_ast_t *exp, int *counter)
+char *term_getrval(mpc_ast_t *term, int *counter)
 {
+	/*
+	 * term		: <factor> ('*' | '/' | '%') <term>
+	 * 		| <factor> ;
+	 */
+	assert(term->children_num == 0 || term->children_num == 3);
+
+	/* XXX: need to dispose of factor in some cases */
+	mpc_ast_t *factor = firstchild(term);
+	assert(factor);
+
+	char *factor_rval = factor_getrval(factor, counter);
+	if (term->children_num == 0) {
+		return factor_rval;
+	}
+
+	assert(term->children_num == 3);
+
+	mpc_ast_t *op = term->children[1];
+	mpc_ast_print(term);
+	assert(strcmp(op->tag, "char") == 0);
+	
+	char *term_rval = term_getrval(term->children[2], counter);
+
+	char *temp = getvar(counter);
+	printf("%s := %s %s %s\n", temp, factor_rval, op->contents, term_rval);
+
+	free(factor_rval);
+	free(term_rval);
+
+	return temp;
+}
+
+char *lexp_getrval(mpc_ast_t *exp, int *counter)
+{
+	/*
+	 * lexp		: <term> ('+' | '-') <lexp>
+	 * 		| <term> ;
+	 */
+	assert(exp->children_num == 0 || exp->children_num == 3);
+	
+	/* XXX: need to dispose of term in some cases */
+	mpc_ast_t *term = firstchild(exp);
+	assert(term);
+
+	char *term_rval = term_getrval(term, counter);
 	if (exp->children_num == 0) {
-		fprintf(stderr, "0 child lexp\n");
-		exit(EXIT_FAILURE);
+		return term_rval;
 	}
 
-	char *first_rval = term_rval(exp->children[0], counter);
-	if (exp->children_num == 1) {
-		return first_rval;
-	}
-
-	if (exp->children_num < 3) {
-		fprintf(stderr, "%d child lexp\n", exp->children_num);
-		exit(EXIT_FAILURE);
-	}
+	assert(exp->children_num == 3);
 
 	mpc_ast_t *op = exp->children[1];
-	if (strcmp(op->tag, "char") != 0) {
-		fprintf(stderr, "non char op '%s'\n", op->tag);
-		exit(EXIT_FAILURE);
-	}
+	assert(strcmp(op->tag, "char") == 0);
 	
-	/* need recursion in grammar */
+	char *lexp_rval = lexp_getrval(exp->children[2], counter);
 
-	char *temp = getvar(*counter);
-	printf("%s := %s %s %s\n", temp, first_rval, op->contents, "<place>");
+	char *temp = getvar(counter);
+	printf("%s := %s %s %s\n", temp, term_rval, op->contents, lexp_rval);
+
+	free(term_rval);
+	free(lexp_rval);
+
 	return temp;
 }
 
@@ -110,7 +192,8 @@ void stmt_gen(mpc_ast_t *stmt, int *counter)
 			printf("ret\n");
 			return;
 		case 3:
-			printf("ret %s\n", lexp_rval(stmt->children[1], counter));
+			printf("ret %s\n", lexp_getrval(stmt->children[1],
+				counter));
 			return;
 		default:
 			fprintf(stderr, "%d child statement\n", stmt->children_num);
