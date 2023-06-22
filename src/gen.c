@@ -225,6 +225,7 @@ void proc_gen(mpc_ast_t *proc)
 
 void gen(mpc_result_t *res)
 {
+	mpc_ast_print((mpc_ast_t *) res->output);
 	mpc_ast_t *main = findmain((mpc_ast_t *) res->output);
 	if (!main) {
 		fprintf(stderr, "cannot find main\n");
