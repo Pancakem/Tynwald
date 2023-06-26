@@ -11,6 +11,10 @@ int main(int argc, char **argv)
   init_parser(&psr);
   mpc_result_t *res = parse_grammar(&psr, argv[1]);
   delete_parser(&psr);
+
+  /*
+    Generate program symbols
+   */
   free(res);
   return 0;
 }
