@@ -1,14 +1,14 @@
-
 #include "stack.h"
 #include "error.h"
 
-void stack_new(tynwald_stack_t *stack) {
-  stack = (tynwald_stack_t *)malloc(sizeof(tynwald_stack_t));
+tynwald_stack_t *stack_new(void) {
+  tynwald_stack_t *stack = (tynwald_stack_t *)malloc(sizeof(tynwald_stack_t));
   SYSEXPECT(stack != NULL);
   stack->data = (void **)malloc(sizeof(void *) * STACK_INIT_CAPACITY);
   SYSEXPECT(stack->data != NULL);
   stack->size = 0;
   stack->capacity = STACK_INIT_CAPACITY;
+  return stack;
 }
 
 void stack_destroy(tynwald_stack_t *stack) {
@@ -16,7 +16,7 @@ void stack_destroy(tynwald_stack_t *stack) {
   free(stack);
 }
 
-void stack_push(tynwald_stack_t *stack, void *p) {
+void stack_push(tynwald_stack_t *stack, void *p) {  
   if(stack->size == stack->capacity) {
     void **old = stack->data;
     stack->data = malloc(sizeof(void *) * stack->capacity * 2);
@@ -40,13 +40,13 @@ void *stack_peek(tynwald_stack_t *stack) {
 }
 
 // Offset is from the top of the stack towards the bottom
-void *stack_peek_at(tynwald_stack_t *stack, int offset) {
-  assert(offset >= 0 && offset < stack->size);
+void *stack_peek_at(tynwald_stack_t *stack, size_t offset) {
+  assert(offset < stack->size);
   return stack->data[stack->size - 1 - offset];
 }
 
-void *stack_at(tynwald_stack_t *stack, int index) {
-  assert(index >= 0 && index < stack->size);
+void *stack_at(tynwald_stack_t *stack, size_t index) {
+  assert(index < stack->size);
   return stack->data[index];
 }
 

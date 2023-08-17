@@ -11,18 +11,18 @@
 
 // Implements a general stack which is used in the shift-reduce parsing algo.
 typedef struct {
-  int size;
-  int capacity;
+  size_t size;
+  size_t capacity;
   void **data;
 } tynwald_stack_t;
 
-void stack_new(tynwald_stack_t *stack);
+tynwald_stack_t *stack_new(void);
 void stack_destroy(tynwald_stack_t *stack);
 void stack_push(tynwald_stack_t *stack, void *p);
 void *stack_pop(tynwald_stack_t *stack);
 void *stack_peek(tynwald_stack_t *stack);
-void *stack_peek_at(tynwald_stack_t *stack, int offset);
-void *stack_at(tynwald_stack_t *stack, int index);
+void *stack_peek_at(tynwald_stack_t *stack, size_t offset);
+void *stack_at(tynwald_stack_t *stack, size_t index);
 int stack_empty(tynwald_stack_t *stack);
 int stack_size(tynwald_stack_t *stack);
 void **stacktopaddr(tynwald_stack_t *stack);

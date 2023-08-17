@@ -26,8 +26,8 @@ typedef struct {
   eq_cb_t eq;
   hash_cb_t hash;
   hashval_t mask;
-  int size;
-  int capacity;
+  size_t size;
+  size_t capacity;
   void **keys;
   void **values;
 } hashtable_t;
@@ -35,7 +35,7 @@ typedef struct {
 int streq_cb(void *a, void *b);
 int strcmp_cb(void *a, void *b);
 hashval_t strhash_cb(void *a);
-void ht_new(hashtable_t *ht, eq_cb_t eq, hash_cb_t hash);
+hashtable_t *ht_new(eq_cb_t eq, hash_cb_t hash);
 hashtable_t *ht_str_new(void);
 void ht_destroy(hashtable_t *ht);
 int ht_size(hashtable_t *ht);

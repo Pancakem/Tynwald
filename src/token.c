@@ -69,7 +69,7 @@ int precedences[51] = {
 token_cxt_t *token_cxt_new(char *input) {
   token_cxt_t *cxt = (token_cxt_t *)malloc(sizeof(token_cxt_t));
   SYSEXPECT(cxt != NULL);
-  stack_new(cxt->udef_types);
+  cxt->udef_types = stack_new();
   stack_push(cxt->udef_types, ht_str_new());
   cxt->pb_head = cxt->pb_tail = NULL;
   cxt->s = cxt->begin = input;

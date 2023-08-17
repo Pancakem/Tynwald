@@ -7,11 +7,11 @@ parse_exp_cxt_t *parse_exp_new(char *input)
 {
   parse_exp_cxt_t *cxt = (parse_exp_cxt_t *)malloc(sizeof(parse_exp_cxt_t));
   SYSEXPECT(cxt != NULL);
-  stack_new(cxt->stacks[0]);
-  stack_new(cxt->stacks[1]);
-  stack_new(cxt->tops[0]);
-  stack_new(cxt->tops[1]);
-  stack_new(cxt->prev_active);
+  cxt->stacks[0] = stack_new();
+  cxt->stacks[1] = stack_new();
+  cxt->tops[0] = stack_new();
+  cxt->tops[1] = stack_new();
+  cxt->prev_active = stack_new();
   // If the first token is an operator then it must be prefix operator
   cxt->last_active_stack = OP_STACK;
   cxt->token_cxt = token_cxt_new(input);
@@ -28,11 +28,11 @@ void parse_exp_reinit(parse_exp_cxt_t *cxt, char *input)
   stack_destroy(cxt->tops[1]);
   stack_destroy(cxt->prev_active);
   // Reinitialize stacks and pointers
-  stack_new(cxt->stacks[0]);
-  stack_new(cxt->stacks[1]);
-  stack_new(cxt->tops[0]);
-  stack_new(cxt->tops[1]);
-  stack_new(cxt->prev_active);
+  cxt->stacks[0] = stack_new();
+  cxt->stacks[1] = stack_new();
+  cxt->tops[0] = stack_new();
+  cxt->tops[1] = stack_new();
+  cxt->prev_active = stack_new();
   // If the first token is an operator then it must be prefix operator
   cxt->last_active_stack = OP_STACK;
   token_cxt_reinit(cxt->token_cxt, input);

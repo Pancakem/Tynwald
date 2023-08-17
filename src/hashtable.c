@@ -13,8 +13,8 @@ hashval_t strhash_cb(void *a) {
   return hashval;
 }
 
-void ht_new(hashtable_t *ht, eq_cb_t eq, hash_cb_t hash) {
-  ht = (hashtable_t *)malloc(sizeof(hashtable_t));
+hashtable_t * ht_new(eq_cb_t eq, hash_cb_t hash) {
+  hashtable_t *ht = (hashtable_t *)malloc(sizeof(hashtable_t));
   SYSEXPECT(ht != NULL);
   ht->eq = eq;
   ht->hash = hash;
@@ -26,11 +26,11 @@ void ht_new(hashtable_t *ht, eq_cb_t eq, hash_cb_t hash) {
   SYSEXPECT(ht->keys != NULL && ht->values != NULL);
   memset(ht->keys, 0x00, sizeof(void *) * ht->capacity);
   memset(ht->values, 0x00, sizeof(void *) * ht->capacity);
+  return ht;
 }
 
 hashtable_t *ht_str_new(void) {
-  hashtable_t *ht = NULL;
-  ht_new(ht, streq_cb, strhash_cb);
+  hashtable_t *ht = ht_new(streq_cb, strhash_cb);
   return ht;
 }
 
@@ -79,7 +79,7 @@ void ht_resize(hashtable_t *ht) {
   SYSEXPECT(new_keys != NULL && new_values != NULL);
   memset(new_keys, 0x00, sizeof(void *) * ht->capacity);
   memset(new_values, 0x00, sizeof(void *) * ht->capacity);  // Avoid values having HT_NOTFOUND
-  for(int i = 0;i < ht->capacity / 2;i++) {
+  for(size_t i = 0;i < ht->capacity / 2;i++) {
     if(ht->keys[i] && ht->keys[i] != HT_REMOVED) {
       int slot = ht_find_slot(ht, new_keys, ht->keys[i], HT_OP_INSERT);
       assert(new_keys[slot] == NULL);

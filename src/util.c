@@ -34,14 +34,15 @@ char *read_file(const char *file_path)
  * @param str
  * @return void 
  */
-void str_new(str_t *str) {
-  str = (str_t *)malloc(sizeof(str_t));
+str_t *str_new(void) {
+  str_t *str = (str_t *)malloc(sizeof(str_t));
   SYSEXPECT(str != NULL);
   str->s = (char *)malloc(STR_INIT_SIZE + 1);
   SYSEXPECT(str->s != NULL);
   str->capacity = STR_INIT_SIZE;
   str->size = 0;
   str->s[0] = '\0';
+  return str;
 }
 
 /**
@@ -66,7 +67,7 @@ int str_size(str_t *str) { return str->size; }
  * @param str 
  * @param size 
  */
-void str_extend(str_t *str, int size) {
+void str_extend(str_t *str, size_t size) {
   if(size > str->capacity) {
     str->s = realloc(str->s, size + 1);
     SYSEXPECT(str->s != NULL);

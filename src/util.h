@@ -7,16 +7,16 @@
 #define MAX_INT_DIGITS 64    // Can't be that long...
 
 typedef struct {
-  int size;
-  int capacity;          // Both excluding the terminating 0
+  size_t size;
+  size_t capacity;          // Both excluding the terminating 0
   char *s;
 } str_t;
 
-void str_new(str_t *str);
+str_t *str_new(void);
 void str_destroy(str_t *str);
 void str_clear(str_t *str);
 int str_size(str_t *str);
-void str_extend(str_t *str, int size);
+void str_extend(str_t *str, size_t size);
 void str_append(str_t *str, char ch);
 void str_prepend(str_t *str, char ch);
 void str_concat(str_t *str, const char *s);
