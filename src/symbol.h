@@ -25,13 +25,11 @@ typedef enum {
 } symbol_type;
 
 typedef struct {
-  symbol_type symbol_type;
   type type;
   char* name;
 } var_symbol;
 
 typedef struct {
-  symbol_type symbol_type;
   type type;
   char* name;
   var_symbol* args;
@@ -40,5 +38,13 @@ typedef struct {
 typedef union {
   fun_symbol fun;
   var_symbol var;
+} symbol_value;
+
+typedef struct {
+  symbol_type type;
+  symbol_value val;
 } symbol;
+
+
+unsigned long symbol_hash(symbol*);
 #endif
