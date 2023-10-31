@@ -10,10 +10,9 @@ typedef enum {
 } base_type;
 
 typedef struct {
-  base_type pointer;
   base_type type;
+  struct pointer_type* ptr;    /* allow multiple levels */
 } pointer_type;
-
 
 typedef union {
   base_type b_type;
@@ -37,4 +36,9 @@ typedef struct {
   char* name;
   var_symbol* args;
 } fun_symbol;
+
+typedef union {
+  fun_symbol fun;
+  var_symbol var;
+} symbol;
 #endif
