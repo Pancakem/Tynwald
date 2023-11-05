@@ -4,11 +4,16 @@
 #include "hashtable.h"
 #include "symbol.h"
 
-typedef struct {
+#define ERR_SYMBOL_IN_SCOPE -5
+#define ERR_SYMBOL_NOT_IN_SCOPE 0
+
+struct scope_ {
   int level;
-  struct scope* parent_scope;
+  struct scope_* parent_scope;
   hashtable_t* table;
-} scope;
+};
+
+typedef struct scope_ scope;
 
 scope* init_scope(void);
 int extend_scope(scope* scope, symbol sym);
